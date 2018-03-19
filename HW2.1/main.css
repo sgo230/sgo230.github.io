@@ -1,0 +1,11 @@
+.axis .domain {
+  display: none;
+}
+
+.axis tick {
+  display: none;
+}
+
+.title {
+  font-family: sans-serif;
+}
