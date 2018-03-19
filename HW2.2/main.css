@@ -1,0 +1,50 @@
+.zipcode {
+  stroke: black;
+  stroke-width: 1px;
+  fill: none;
+}
+
+.bar {
+  fill: #D3D3D3;
+  stroke: black;
+  stroke-width: 0.7px;
+}
+
+.bar:hover {
+  fill: #4682b4;
+}
+
+.axis--y path {
+  display: none;
+}
+
+.xaxis path {
+  display: none;
+}
+
+.legendticks path {
+  display: none;
+}
+
+.xlabel {
+  font-size: 11px;  
+  display: block
+}
+
+.legendtitle {
+  font-size: 10px;
+  font-family: sans-serif;
+  font-weight: bold;
+  display: block;
+}
+
+.xlabel {
+  font-size: 10px;
+  font-family: sans-serif;
+  display: block;
+}
+
+.label {
+  fill: black;
+  font-size: 18px;
+}
