@@ -12,7 +12,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 <head>
   <meta charset="UTF-8">
-  <title>Carto.js Guide</title>
+  <title>Data Vis Final</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
@@ -91,9 +91,8 @@ body {
 </head>
 
 <body>
-  <a href="javascript:resetLayerQuery(crimeDataset, sqlCrimeBase);">Clear</a>
   <p id="title">Visualizing Crime Across New York City Precincts</p>
-  
+
   <div id="formButtons">
   <form id="crimeSelect" class="button" name="Select Crime Type">
 	<label>Crime Type:</label>
@@ -107,7 +106,7 @@ body {
     <option value="GRAND LARCENY">Grand Larceny</option>
 </select>
 	<br>
-    
+
 </form>
 	<br>
 <form id="yearSelect" class="button" name="Select Year">
@@ -233,7 +232,7 @@ var crimeTypesChart = new Highcharts.chart('crimeTypesChart', {
     });
 
 var map = L.map('map')
-            .setView([40.692908,-73.9896452], 
+            .setView([40.692908,-73.9896452],
                      11);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png', {
       maxZoom: 18
@@ -476,13 +475,13 @@ var myBtn = document.getElementById('crimeUpdate');
 myBtn.addEventListener('click', function(event) {
 var e = document.getElementById("crimeSelector");
 var selectedCrime = e.value;
-	
+
 var f = document.getElementById("yearSelector");
 var selectedYear = f.value;
-	
+
 var h = document.getElementById("monthSelector");
 var selectedMonth = h.value;
-	
+
 appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE crimetype = '" + selectedCrime + "'AND year ='" + selectedYear + "'AND month = '" + selectedMonth + "'");
 });
 
@@ -491,15 +490,15 @@ var myBtn = document.getElementById('crimeUpdate');
 myBtn.addEventListener('click', function(event) {
 var e = document.getElementById("crimeSelector");
 var selectedCrime = e.value;
-	
+
 var f = document.getElementById("yearSelector");
 var selectedYear = f.value;
-	
+
 var h = document.getElementById("monthSelector");
 var selectedMonth = h.value;
 
 var updatedQuery = ("WHERE crimetype in ('" + selectedCrime + "') AND year in ('" + selectedYear + "') AND month in ('" + selectedMonth + "')");
-	
+
 appendLayerQuery(crimeDataset, sqlCrimeBase, updatedQuery);
 
 });
