@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<!--
+Created using JS Bin
+http://jsbin.com
+
+Copyright (c) 2018 by sgo230 (http://jsbin.com/neroloq/17/edit)
+
+Released under the MIT license: http://jsbin.mit-license.org
+-->
+<meta name="robots" content="noindex">
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Carto.js Guide</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+  <script src="https://cdn.rawgit.com/CartoDB/cartodb.js/@4.0.0-alpha.28/carto.js"></script>
+
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+<style id="jsbin-css">
+#title {
+  font-family: sans-serif;
+  font-size: 48px;
+  text-align: left;
+  width: 1450px;
+  position: absolute;
+  margin: 5px 0px 0px 10px;
+}
+
+body {
+  background: #F8F8F8;
+}
+
+body {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+}
+
+#sources {
+  position:absolute;
+  top:900px;
+  margin-left: 10px;
+}
+
+#formButtons {
+  left: 30px;
+  position:absolute;
+  top: 100px;
+};
+
+.highcharts-point:hover {
+  fill: steelblue;
+}
+
+#blah {
+  position:absolute;
+  top:270px;
+}
+
+#crimeTypesChart {
+  position:absolute;
+  top:470px;
+}
+
+#map {
+  left:500px;
+  width:calc(100% - 500px);
+  height: 800px;
+  float: left;
+  top: 100px;
+  left: 425px;
+  position: absolute;
+  border: 1px solid #F0F0F0;
+}
+
+.highcharts-background {
+  display:none
+}
+
+.leaflet-popup-content-wrapper{
+  font-size: 12px;
+  border: solid #99cccc;
+  background: #f7f7f7;
+}
+
+</style>
+</head>
+
+<body>
+  <a href="javascript:resetLayerQuery(crimeDataset, sqlCrimeBase);">Clear</a>
+  <p id="title">Visualizing Crime Across New York City Precincts</p>
+  
+  <div id="formButtons">
+  <form id="crimeSelect" class="button" name="Select Crime Type">
+	<label>Crime Type:</label>
+<select name="crimeSelector" id="crimeSelector">
+		<option value="MURDER', 'ROBBERY', 'FELONY ASSAULT', 'GRAND THEFT AUTO', 'BURGLARY', 'GRAND LARCENY">All Crime</option>
+		<option value="MURDER">Murder</option>
+    <option value="GRAND THEFT AUTO">Grand Theft Auto</option>
+    <option value="FELONY ASSAULT">Felony Assault</option>
+	  <option value="ROBBERY">Robbery</option>
+    <option value="BURGLARY">Burglary</option>
+    <option value="GRAND LARCENY">Grand Larceny</option>
+</select>
+	<br>
+    
+</form>
+	<br>
+<form id="yearSelect" class="button" name="Select Year">
+	<label>Year:</label>
+	<select name="yearSelector" id="yearSelector">
+		<option value="2012', '2013', '2014', '2015', '2016">All Years</option>
+		<option value=2012>2012</option>
+    <option value=2013>2013</option>
+    <option value=2014>2014</option>
+	  <option value=2015>2015</option>
+    <option value=2016>2016</option>
+</select>
+	<br>
+</form>
+	<br>
+<form id="monthSelect" class="button" name="Select Month" action="appendLayerQuery()">
+		<label>Month:</label>
+<select name="monthSelector" id="monthSelector">
+    <option value="1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12">All Months</option>
+		<option value=1>January</option>
+    <option value=2>February</option>
+    <option value=3>March</option>
+	  <option value=4>April</option>
+    <option value=5>May</option>
+    <option value=6>June</option>
+	  <option value=7>July</option>
+    <option value=8>August</option>
+    <option value=9>September</option>
+	  <option value=10>October</option>
+    <option value=11>November</option>
+    <option value=12>December</option>
+</select>
+	<br><br>
+<input type="button" id='crimeUpdate' value="Update Map">
+<input type="button" id="crimeReset" value="Reset Map">
+    </form>
+	<br>
+	</div>
+<div id="blah"></div>
+<div id="crimeTypesChart"></div>
+  <div id="map"></div>
+  <p id="sources">Source: <a href="https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i">NYC Open Data</a>
+  </p>
+<script id="jsbin-javascript">
+Highcharts.setOptions({
+    lang: {
+        thousandsSep: ','
+    },
+    chart: {
+        style: {
+            fontFamily: "'Open Sans', sans-serif"
+        }
+    }
+});
+
+var crimeTypesChart = new Highcharts.chart('crimeTypesChart', {
+      chart: {
+        type: 'bar',
+        height: 440,
+        width: 400
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        type: 'category',
+        title: {
+          text: "Precinct"
+        },
+        lineColor: '#2F4F4F',
+        tickLength: 4,
+        tickColor: '#2F4F4F',
+      },
+      yAxis: {
+        opposite: true,
+        min: 0,
+        tickColor: '#2F4F4F',
+        title: {
+          text: null
+        },
+        labels: {
+          overflow: 'justify'
+        }
+      },
+      tooltip: {
+        enabled: true,
+        headerFormat: '<span style="font-size: 10px"> Precinct: {point.key} </span><br/>'
+      },
+      plotOptions: {
+        bar: {
+          color: '#99cccc',
+          pointPadding: 0,
+          groupPadding: 0.1,
+          borderWidth: 1,
+          borderColor: 'grey',
+          allowPointSelect: true,
+          dataLabels: {
+            enabled: false
+          }
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      series: [{
+        name: 'Crimes',
+        data: null,
+        cursor: 'pointer',
+        point: {
+          events: {
+            click: function() {
+              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE precinct = " + this.name + "");
+            }
+          }
+        }
+      },],
+      exporting: {
+        enabled: false
+      }
+    });
+
+var map = L.map('map')
+            .setView([40.692908,-73.9896452], 
+                     11);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    L.control.scale().addTo(map);
+
+    var cto = new carto.Client({
+      apiKey: 'NotNeeded',
+      username: 'mjdsauter'
+    });
+
+    var sqlCrimeBase = "SELECT * FROM mjdsauter.nyccrimedata";
+    var crimeDataset = new carto.source.SQL(sqlCrimeBase);
+    var crimeDatasetForWidget = new carto.source.SQL(sqlCrimeBase);
+ var crimeDatasetForWidget2 = new carto.source.SQL(sqlCrimeBase);
+    var crimePointStyle = new carto.style.CartoCSS(`
+  #layer {
+  marker-width: 3;
+  marker-fill: ramp([crimetype], (#EE4D5A, #51e656, #FF710F, #7d25d4, #efe705, #72efde), ("GRAND LARCENY", "GRAND THEFT AUTO", "ROBBERY", "FELONY ASSAULT", "BURGLARY", "MURDER"), "=");
+  marker-fill-opacity: 1;
+  marker-allow-overlap: false;
+  marker-line-width: 1;
+  marker-line-color: #FFFFFF;
+  marker-line-opacity: 0.5;
+}`);
+
+    function titleCase(str) {
+  return str.toLowerCase().split(' ').map(x=>x[0].toUpperCase()+x.slice(1)).join(' ');
+}
+
+    var crimeLayer = new carto.layer.Layer(crimeDataset, crimePointStyle, {
+      featureClickColumns: ['precinct', 'crimetype', 'month', 'year', 'date']
+    });
+
+    cto.addLayer(crimeLayer);
+
+    cto.getLeafletLayer().addTo(map);
+
+    var popup = L.popup();
+    crimeLayer.on('featureClicked', function(featureEvent) {
+      popup.setLatLng(featureEvent.latLng);
+      popup.setContent('Precinct: ' + featureEvent.data.precinct + '<br/>' + 'Crime: ' + titleCase(featureEvent.data.crimetype)+ '<br/>' + 'Date: ' + featureEvent.data.month + '/' + featureEvent.data.date + '/'+ featureEvent.data.year);
+      popup.openOn(map);
+    });
+
+    var crimeTypesDataview = new carto.dataview.Category(crimeDatasetForWidget, 'precinct', {
+      limit: 30
+    });
+
+    var numberOfCrimes = new carto.dataview.Formula(crimeDataset, 'crimetype', {
+      operation: carto.operation.COUNT
+    });
+
+
+    crimeTypesDataview.on('dataChanged', function(newData) {
+      var crimeTypes = newData.categories.map(function(category) {
+        return [category.name, category.value];
+      }).sort(function(a, b) {
+        return b[1] - a[1]
+      });
+      refreshCrimetypesWidget(crimeTypes);
+    });
+
+    numberOfCrimes.on('dataChanged', function(newData) {
+      refreshNumberOfCrimesWidget(newData.result);
+    });
+
+    var refreshNumberOfCrimesWidget = function(numCrimes) {
+      var widget = document.querySelector('#numCrimesWidget');
+      var labelCrimes = $("#crime-count-result").text(Math.round(numCrimes));
+    };
+
+    function refreshCrimetypesWidget(crimeTypes) {
+      crimeTypesChart.series[0].setData(crimeTypes.slice(1), true);
+    };
+
+    function appendLayerQuery(dataset, sqlBase, appendText) {
+      var sql = sqlBase + ' ' + appendText;
+      dataset.setQuery(sql);
+    };
+
+    function resetLayerQuery(dataset, sqlBase) {
+      dataset.setQuery(sqlBase);
+      var selectedPoints = crimeTypesChart.getSelectedPoints();
+      $.each(selectedPoints, function(i, p) {
+        p.select(); //Set the selected points to unselected
+      });
+      crimeTypesChart.redraw();
+    };
+
+    cto.addDataview(crimeTypesDataview);
+    cto.addDataview(numberOfCrimes);
+
+
+
+
+/*****/
+
+var blah = new Highcharts.chart('blah', {
+      chart: {
+        type: 'column',
+        height: 200,
+        width: 400
+      },
+      title: {
+        text: null
+      },
+      xAxis: {
+        type: 'category',
+        title: {
+          text: null
+        },
+        lineColor: '#2F4F4F',
+        tickLength: 4,
+        tickColor: '#2F4F4F',
+      },
+      yAxis: {
+        opposite: false,
+        min: 0,
+        tickColor: '#2F4F4F',
+        title: {
+          text: '# of Crimes'
+        },
+        labels: {
+          overflow: 'justify'
+        }
+      },
+      tooltip: {
+        enabled: true,
+        headerFormat: '<span style="font-size: 10px"> Precinct: {point.key} </span><br/>'
+      },
+      plotOptions: {
+        column: {
+          color: '#99cccc',
+          pointPadding: 0,
+          groupPadding: 0.1,
+          borderWidth: 1,
+          borderColor: 'grey',
+          allowPointSelect: true,
+          dataLabels: {
+            enabled: false
+          }
+        }
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      series: [{
+        name: 'Crimes',
+        data: null,
+        cursor: 'pointer',
+        point: {
+          events: {
+            click: function() {
+              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE borough = '" + this.name + "'")
+            }
+          }
+        }
+      },],
+      exporting: {
+        enabled: false
+      }
+    });
+
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+
+ var crimeTypesDataview2 = new carto.dataview.Category(crimeDatasetForWidget2, 'borough', {
+      limit: 25
+    });
+
+    var numberOfCrimes2 = new carto.dataview.Formula(crimeDataset, 'crimetype', {
+      operation: carto.operation.COUNT
+    });
+
+
+    crimeTypesDataview2.on('dataChanged', function(newData2) {
+      var crimeTypes2 = newData2.categories.map(function(category) {
+        return [category.name, category.value];
+      }).sort(function(a, b) {
+        return b[1] - a[1]
+      });
+      refreshCrimetypesWidget2(crimeTypes2);
+    });
+
+var refreshNumberOfCrimesWidget2 = function(numCrimes2) {
+    };
+
+
+
+
+    function refreshCrimetypesWidget2(crimeTypes2) {
+  for (i=0; i<crimeTypes2.length;i++){
+crimeTypes2[i][0] = toTitleCase(crimeTypes2[i][0])
+}
+  blah.series[0].setData(crimeTypes2.slice(0,5), true);
+    };
+
+    function appendLayerQuery(dataset, sqlBase, appendText) {
+      var sql = sqlBase + ' ' + appendText;
+      dataset.setQuery(sql);
+    };
+
+    function resetLayerQuery2(dataset, sqlBase) {
+      dataset.setQuery(sqlBase);
+      var selectedPoints = blah.getSelectedPoints();
+      $.each(selectedPoints, function(i, p) {
+        p.select(); //Set the selected points to unselected
+      });
+      blah.redraw();
+    };
+
+    cto.addDataview(crimeTypesDataview2);
+    cto.addDataview(numberOfCrimes2);
+
+
+function resetLayerQuery2(dataset, sqlBase) {
+      dataset.setQuery(sqlBase);
+      var selectedPoints = blah.getSelectedPoints();
+      $.each(selectedPoints, function(i, p) {
+        p.select(); //Set the selected points to unselected
+      });
+      blah.redraw();
+    };
+
+    cto.addDataview(crimeTypesDataview2);
+    cto.addDataview(numberOfCrimes2);
+
+
+
+var myBtn = document.getElementById('crimeUpdate');
+
+myBtn.addEventListener('click', function(event) {
+var e = document.getElementById("crimeSelector");
+var selectedCrime = e.value;
+	
+var f = document.getElementById("yearSelector");
+var selectedYear = f.value;
+	
+var h = document.getElementById("monthSelector");
+var selectedMonth = h.value;
+	
+appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE crimetype = '" + selectedCrime + "'AND year ='" + selectedYear + "'AND month = '" + selectedMonth + "'");
+});
+
+var myBtn = document.getElementById('crimeUpdate');
+
+myBtn.addEventListener('click', function(event) {
+var e = document.getElementById("crimeSelector");
+var selectedCrime = e.value;
+	
+var f = document.getElementById("yearSelector");
+var selectedYear = f.value;
+	
+var h = document.getElementById("monthSelector");
+var selectedMonth = h.value;
+
+var updatedQuery = ("WHERE crimetype in ('" + selectedCrime + "') AND year in ('" + selectedYear + "') AND month in ('" + selectedMonth + "')");
+	
+appendLayerQuery(crimeDataset, sqlCrimeBase, updatedQuery);
+
+});
+
+var clearBtn = document.getElementById('crimeReset');
+
+clearBtn.addEventListener('click', function(event) {
+resetLayerQuery(crimeDataset, sqlCrimeBase);
+});
+</script>
+</body>
+
+</html>
