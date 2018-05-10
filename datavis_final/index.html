@@ -3,7 +3,7 @@
 Created using JS Bin
 http://jsbin.com
 
-Copyright (c) 2018 by sgo230 (http://jsbin.com/neroloq/21/edit)
+Copyright (c) 2018 by sgo230 (http://jsbin.com/neroloq/23/edit)
 
 Released under the MIT license: http://jsbin.mit-license.org
 -->
@@ -12,7 +12,7 @@ Released under the MIT license: http://jsbin.mit-license.org
 
 <head>
   <meta charset="UTF-8">
-  <title>Data Vis Final</title>
+  <title>Carto.js Guide</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
@@ -281,21 +281,18 @@ var sqlBase = "SELECT * FROM sgo2303.police_precincts";
     var pDataset = new carto.source.SQL(sqlBase);
     var pPointStyle = new carto.style.CartoCSS(`
   #layer {
-  polygon-fill: #ffffff;
+  polygon-fill: #F0F0F0;
   polygon-opacity: 0.21;
 }
 #layer::outline {
   line-width: 0.5;
-  line-color: #000000;
+  line-color: #808080;
 }
 #layer::labels {
   text-name: [precinct];
   text-face-name: 'DejaVu Sans Book';
-  text-size: 10;
-  text-fill: #FFFFFF;
+  text-size: 11;
   text-label-position-tolerance: 0;
-  text-halo-radius: 1;
-  text-halo-fill: #6F808D;
   text-dy: -10;
   text-allow-overlap: true;
   text-placement: point;
@@ -429,7 +426,7 @@ var blah = new Highcharts.chart('blah', {
         point: {
           events: {
             click: function() {
-              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE borough = '" + this.name.toUpperCase() + "'")
+              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE borough = '" + this.name + "'")
             }
           }
         }
