@@ -1,164 +1,6 @@
-<!DOCTYPE html>
-<!--
-Created using JS Bin
-http://jsbin.com
-
-Copyright (c) 2018 by sgo230 (http://jsbin.com/neroloq/21/edit)
-
-Released under the MIT license: http://jsbin.mit-license.org
--->
-<meta name="robots" content="noindex">
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <title>Data Vis Final</title>
-
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
-
-  <script src="https://cdn.rawgit.com/CartoDB/cartodb.js/@4.0.0-alpha.28/carto.js"></script>
-
-  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-
-  <script src="https://code.highcharts.com/highcharts.js"></script>
-<style id="jsbin-css">
-#title {
-  font-family: sans-serif;
-  font-size: 48px;
-  text-align: left;
-  width: 1450px;
-  position: absolute;
-  margin: 5px 0px 0px 10px;
-}
-
-body {
-  background: #F8F8F8;
-}
-
-body {
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
-}
-
-#sources {
-  position:absolute;
-  top:900px;
-  margin-left: 10px;
-}
-
-#formButtons {
-  left: 30px;
-  position:absolute;
-  top: 100px;
-};
-
-.highcharts-point:hover {
-  fill: steelblue;
-}
-
-#blah {
-  position:absolute;
-  top:270px;
-}
-
-#crimeTypesChart {
-  position:absolute;
-  top:470px;
-}
-
-#map {
-  left:500px;
-  width:calc(100% - 500px);
-  height: 800px;
-  float: left;
-  top: 100px;
-  left: 425px;
-  position: absolute;
-  border: 1px solid #F0F0F0;
-}
-
-.highcharts-background {
-  display:none
-}
-
-.leaflet-popup-content-wrapper{
-  font-size: 12px;
-  border: solid #99cccc;
-  background: #f7f7f7;
-}
-
-</style>
-</head>
-
-<body>
-  <p id="title">Visualizing Crime Across New York City Precincts</p>
-
-  <div id="formButtons">
-  <form id="crimeSelect" class="button" name="Select Crime Type">
-	<label>Crime Type:</label>
-<select name="crimeSelector" id="crimeSelector">
-		<option value="MURDER', 'ROBBERY', 'FELONY ASSAULT', 'GRAND THEFT AUTO', 'BURGLARY', 'GRAND LARCENY">All Crime</option>
-		<option value="MURDER">Murder</option>
-    <option value="GRAND THEFT AUTO">Grand Theft Auto</option>
-    <option value="FELONY ASSAULT">Felony Assault</option>
-	  <option value="ROBBERY">Robbery</option>
-    <option value="BURGLARY">Burglary</option>
-    <option value="GRAND LARCENY">Grand Larceny</option>
-</select>
-	<br>
-
-</form>
-	<br>
-<form id="yearSelect" class="button" name="Select Year">
-	<label>Year:</label>
-	<select name="yearSelector" id="yearSelector">
-		<option value="2012', '2013', '2014', '2015', '2016">All Years</option>
-		<option value=2012>2012</option>
-    <option value=2013>2013</option>
-    <option value=2014>2014</option>
-	  <option value=2015>2015</option>
-    <option value=2016>2016</option>
-</select>
-	<br>
-</form>
-	<br>
-<form id="monthSelect" class="button" name="Select Month" action="appendLayerQuery()">
-		<label>Month:</label>
-<select name="monthSelector" id="monthSelector">
-    <option value="1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12">All Months</option>
-		<option value=1>January</option>
-    <option value=2>February</option>
-    <option value=3>March</option>
-	  <option value=4>April</option>
-    <option value=5>May</option>
-    <option value=6>June</option>
-	  <option value=7>July</option>
-    <option value=8>August</option>
-    <option value=9>September</option>
-	  <option value=10>October</option>
-    <option value=11>November</option>
-    <option value=12>December</option>
-</select>
-	<br><br>
-<input type="button" id='crimeUpdate' value="Update Map">
-<input type="button" id="crimeReset" value="Reset Map">
-    </form>
-	<br>
-	</div>
-<div id="blah"></div>
-<div id="crimeTypesChart"></div>
-  <div id="map"></div>
-  <p id="sources">Source: <a href="https://data.cityofnewyork.us/Public-Safety/NYPD-Complaint-Data-Historic/qgea-i56i">NYC Open Data</a>
-  </p>
-<script id="jsbin-javascript">
 Highcharts.setOptions({
     lang: {
         thousandsSep: ','
-    },
-    chart: {
-        style: {
-            fontFamily: "'Open Sans', sans-serif"
-        }
     }
 });
 
@@ -235,7 +77,7 @@ var map = L.map('map')
             .setView([40.692908,-73.9896452],
                      11);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png', {
-      maxZoom: 18
+      maxZoom: 18,
     }).addTo(map);
 
     L.control.scale().addTo(map);
@@ -251,7 +93,7 @@ var map = L.map('map')
  var crimeDatasetForWidget2 = new carto.source.SQL(sqlCrimeBase);
     var crimePointStyle = new carto.style.CartoCSS(`
   #layer {
-  marker-width: 4;
+  marker-width: 3;
   marker-fill: ramp([crimetype], (#EE4D5A, #51e656, #FF710F, #7d25d4, #efe705, #72efde), ("GRAND LARCENY", "GRAND THEFT AUTO", "ROBBERY", "FELONY ASSAULT", "BURGLARY", "MURDER"), "=");
   marker-fill-opacity: 1;
   marker-allow-overlap: false;
@@ -271,44 +113,6 @@ var map = L.map('map')
     cto.addLayer(crimeLayer);
 
     cto.getLeafletLayer().addTo(map);
-
-/**/
-var client2 = new carto.Client({
-      apiKey: 'NotNeeded',
-      username: 'sgo2303'
-    });
-var sqlBase = "SELECT * FROM sgo2303.police_precincts";
-    var pDataset = new carto.source.SQL(sqlBase);
-    var pPointStyle = new carto.style.CartoCSS(`
-  #layer {
-  polygon-fill: #ffffff;
-  polygon-opacity: 0.21;
-}
-#layer::outline {
-  line-width: 0.5;
-  line-color: #000000;
-}
-#layer::labels {
-  text-name: [precinct];
-  text-face-name: 'DejaVu Sans Book';
-  text-size: 10;
-  text-fill: #FFFFFF;
-  text-label-position-tolerance: 0;
-  text-halo-radius: 1;
-  text-halo-fill: #6F808D;
-  text-dy: -10;
-  text-allow-overlap: true;
-  text-placement: point;
-  text-placement-type: dummy;
-}`);
-
-    var pLayer = new carto.layer.Layer(pDataset, pPointStyle);
-
-    client2.addLayer(pLayer);
-
-    client2.getLeafletLayer().addTo(map);
-/**/
-
 
     var popup = L.popup();
     crimeLayer.on('featureClicked', function(featureEvent) {
@@ -429,7 +233,7 @@ var blah = new Highcharts.chart('blah', {
         point: {
           events: {
             click: function() {
-              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE borough = '" + this.name.toUpperCase() + "'")
+              appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE borough = '" + this.name + "'")
             }
           }
         }
@@ -438,11 +242,6 @@ var blah = new Highcharts.chart('blah', {
         enabled: false
       }
     });
-
-function toTitleCase(str)
-{
-    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
-}
 
 
  var crimeTypesDataview2 = new carto.dataview.Category(crimeDatasetForWidget2, 'borough', {
@@ -470,9 +269,7 @@ var refreshNumberOfCrimesWidget2 = function(numCrimes2) {
 
 
     function refreshCrimetypesWidget2(crimeTypes2) {
-  for (i=0; i<crimeTypes2.length;i++){
-crimeTypes2[i][0] = toTitleCase(crimeTypes2[i][0])
-}
+      console.log(crimeTypes2)
   blah.series[0].setData(crimeTypes2.slice(0,5), true);
     };
 
@@ -522,31 +319,3 @@ var selectedMonth = h.value;
 
 appendLayerQuery(crimeDataset, sqlCrimeBase, "WHERE crimetype = '" + selectedCrime + "'AND year ='" + selectedYear + "'AND month = '" + selectedMonth + "'");
 });
-
-var myBtn = document.getElementById('crimeUpdate');
-
-myBtn.addEventListener('click', function(event) {
-var e = document.getElementById("crimeSelector");
-var selectedCrime = e.value;
-
-var f = document.getElementById("yearSelector");
-var selectedYear = f.value;
-
-var h = document.getElementById("monthSelector");
-var selectedMonth = h.value;
-
-var updatedQuery = ("WHERE crimetype in ('" + selectedCrime + "') AND year in ('" + selectedYear + "') AND month in ('" + selectedMonth + "')");
-
-appendLayerQuery(crimeDataset, sqlCrimeBase, updatedQuery);
-
-});
-
-var clearBtn = document.getElementById('crimeReset');
-
-clearBtn.addEventListener('click', function(event) {
-resetLayerQuery(crimeDataset, sqlCrimeBase);
-});
-</script>
-</body>
-
-</html>
