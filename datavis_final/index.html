@@ -162,6 +162,7 @@ Highcharts.setOptions({
     }
 });
 
+// Create bar chart by precinct
 var crimeTypesChart = new Highcharts.chart('crimeTypesChart', {
       chart: {
         type: 'bar',
@@ -231,6 +232,8 @@ var crimeTypesChart = new Highcharts.chart('crimeTypesChart', {
       }
     });
 
+// Init base Map
+
 var map = L.map('map')
             .setView([40.692908,-73.9896452],
                      11);
@@ -245,6 +248,8 @@ var map = L.map('map')
       username: 'mjdsauter'
     });
 
+// Add crime dots layer
+
     var sqlCrimeBase = "SELECT * FROM mjdsauter.nyccrimedata";
     var crimeDataset = new carto.source.SQL(sqlCrimeBase);
     var crimeDatasetForWidget = new carto.source.SQL(sqlCrimeBase);
@@ -252,7 +257,7 @@ var map = L.map('map')
     var crimePointStyle = new carto.style.CartoCSS(`
   #layer {
   marker-width: 4;
-  marker-fill: ramp([crimetype], (#EE4D5A, #51e656, #FF710F, #7d25d4, #efe705, #72efde), ("GRAND LARCENY", "GRAND THEFT AUTO", "ROBBERY", "FELONY ASSAULT", "BURGLARY", "MURDER"), "=");
+  marker-fill: ramp([crimetype], (#EE4D5A, #51e656, #FF710F, #7d25d4, #efe705, #3342FF), ("GRAND LARCENY", "GRAND THEFT AUTO", "ROBBERY", "FELONY ASSAULT", "BURGLARY", "MURDER"), "=");
   marker-fill-opacity: 1;
   marker-allow-overlap: true;
   marker-line-width: 1;
@@ -272,7 +277,7 @@ var map = L.map('map')
 
     cto.getLeafletLayer().addTo(map);
 
-/**/
+// Add precinct boundaries and numbers layer
 var client2 = new carto.Client({
       apiKey: 'NotNeeded',
       username: 'sgo2303'
@@ -304,8 +309,8 @@ var sqlBase = "SELECT * FROM sgo2303.police_precincts";
     client2.addLayer(pLayer);
 
     client2.getLeafletLayer().addTo(map);
-/**/
 
+// Tooltip for crimes
 
     var popup = L.popup();
     crimeLayer.on('featureClicked', function(featureEvent) {
@@ -322,7 +327,7 @@ var sqlBase = "SELECT * FROM sgo2303.police_precincts";
       operation: carto.operation.COUNT
     });
 
-
+// Sort bar chart
     crimeTypesDataview.on('dataChanged', function(newData) {
       var crimeTypes = newData.categories.map(function(category) {
         return [category.name, category.value];
@@ -331,6 +336,9 @@ var sqlBase = "SELECT * FROM sgo2303.police_precincts";
       });
       refreshCrimetypesWidget(crimeTypes);
     });
+
+
+// Refresh CARTO crime dots layer on click
 
     numberOfCrimes.on('dataChanged', function(newData) {
       refreshNumberOfCrimesWidget(newData.result);
@@ -365,7 +373,7 @@ var sqlBase = "SELECT * FROM sgo2303.police_precincts";
 
 
 
-/*****/
+// Add by borough Highcharts column chart
 
 var blah = new Highcharts.chart('blah', {
       chart: {
@@ -398,7 +406,7 @@ var blah = new Highcharts.chart('blah', {
       },
       tooltip: {
         enabled: true,
-        headerFormat: '<span style="font-size: 10px"> Precinct: {point.key} </span><br/>'
+        headerFormat: '<span style="font-size: 10px"> Borough: {point.key} </span><br/>'
       },
       plotOptions: {
         column: {
@@ -463,9 +471,6 @@ function toTitleCase(str)
 var refreshNumberOfCrimesWidget2 = function(numCrimes2) {
     };
 
-
-
-
     function refreshCrimetypesWidget2(crimeTypes2) {
   for (i=0; i<crimeTypes2.length;i++){
 crimeTypes2[i][0] = toTitleCase(crimeTypes2[i][0])
@@ -503,7 +508,7 @@ function resetLayerQuery2(dataset, sqlBase) {
     cto.addDataview(crimeTypesDataview2);
     cto.addDataview(numberOfCrimes2);
 
-
+// Form and selections
 
 var myBtn = document.getElementById('crimeUpdate');
 
