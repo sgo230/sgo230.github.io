@@ -26,6 +26,13 @@ This tool can be used by real estate developers, teachers, drivers, and many oth
 -Linked to CARTO for back end: https://nyu.carto.com/u/sgo2303/tables/mjdsauter.nyccrimedata/public/map?redirected=true
 <br><br>
 <b>Design Choices:</b><br>
+
+Map:<br>
+Points were the chosen mark for representing each individual crime. The position of each mark denoted the location of the crime, while the hue indicated the type of crime that occurred. Marks were overlayed atop a map revealing the underlying geography of the distribution, allowing users to infer the real-world location at which the crimes took place.
+<br><br>
+Charts:<br>
+We used lines as the mark for our charts. For the column graph, representing the total counts of crime in each borough, the height of each bar was used to convey each borough's respective count. For the bar graph, which presented the counts of crime per precinct, the width of the bar was the chosen channel. 
+
 <br><br>
 <b>Outcome and Evaluation:</b><br>
 The overall functionality of the visualization allows for many different views of the data, which we are excited about. 
